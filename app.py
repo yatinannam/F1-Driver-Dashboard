@@ -77,7 +77,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title & subtitle
-st.title("🏎️ Formula 1 Driver Career Stats Explorer")
+st.title("Formula 1 Driver Career Stats Explorer")
 st.markdown("---")
 
 # Load data
@@ -99,30 +99,30 @@ st.sidebar.header("Select a Driver")
 selected_driver_name = st.sidebar.selectbox("Driver", drivers['full_name'])
 selected_driver = drivers[drivers['full_name'] == selected_driver_name].iloc[0]
 
-# 👤 Profile Info
-st.subheader("👤 Driver Profile")
+# Profile Info
+st.subheader("Driver Profile")
 st.markdown(f"**Name:** {selected_driver['full_name']}")
 st.markdown(f"**Date of Birth:** {selected_driver['dob']}")
 st.markdown(f"**Nationality:** {selected_driver['nationality']}")
 
-# 📊 Career Stats
+# Career Stats
 driver_results = results[results['driverId'] == selected_driver['driverId']]
 total_races = driver_results['raceId'].nunique()
 total_points = driver_results['points'].sum()
 wins = driver_results[driver_results['position'] == 1].shape[0]
 best_finish = pd.to_numeric(driver_results['position'], errors='coerce').dropna().astype(int).min()
 
-st.subheader("📊 Career Summary")
+st.subheader("Career Summary")
 st.markdown(f"**Total Races:** {total_races}")
 st.markdown(f"**Total Career Points:** {int(total_points)}")
 st.markdown(f"**Wins:** {wins}")
 st.markdown(f"**Best Finish Position:** {best_finish}")
 
-# 📋 Detailed Results
+# Detailed Results
 driver_race_results = driver_results.merge(races, on='raceId', how='left')
 driver_race_results['position'] = pd.to_numeric(driver_race_results['position'], errors='coerce')
 
-st.subheader("📋 Detailed Race Results")
+st.subheader("Detailed Race Results")
 st.dataframe(
     driver_race_results[['year', 'round', 'name', 'position', 'points']].rename(columns={
         'year': 'Year',
@@ -133,10 +133,10 @@ st.dataframe(
     }).sort_values(['Year', 'Round'])
 )
 
-# 📊 Bar Chart: Points by Year
+# Bar Chart: Points by Year
 points_by_year = driver_race_results.groupby('year')['points'].sum().reset_index()
 
-st.subheader("📊 Points by Year")
+st.subheader("Points by Year")
 fig = px.bar(
     points_by_year,
     x='year',
@@ -148,16 +148,16 @@ fig = px.bar(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# 🥧 Pie Chart: Finish Distribution
+# Pie Chart: Finish Distribution
 finish_data = driver_race_results.copy()
 finish_data['position'] = pd.to_numeric(finish_data['position'], errors='coerce').dropna()
 finish_data = finish_data.dropna(subset=['position'])
 
 def bucket(pos):
     if pos == 1:
-        return '🥇 Win'
+        return 'Win'
     elif pos <= 3:
-        return '🏆 Podium'
+        return 'Podium'
     elif pos <= 10:
         return 'Top 10'
     else:
@@ -167,7 +167,7 @@ finish_data['Category'] = finish_data['position'].apply(bucket)
 finish_counts = finish_data['Category'].value_counts().reset_index()
 finish_counts.columns = ['Category', 'Count']
 
-st.subheader("🥧 Finish Position Distribution")
+st.subheader("Finish Position Distribution")
 fig2 = px.pie(
     finish_counts,
     names='Category',
